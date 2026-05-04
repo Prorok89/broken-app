@@ -45,3 +45,13 @@ fn regression_sum_even_off_by_one() {
 fn regression_average_positive_excludes_negatives() {
     assert_eq!(broken_app::average_positive(&[-5, 5, 15]), 10.0);
 }
+
+#[test]
+fn regression_leak_buffer_no_memory_leak() {
+    let data = [0_u8, 1, 0, 2, 3];
+    assert_eq!(leak_buffer(&data), 3);
+
+    for _ in 0..100 {
+        assert_eq!(leak_buffer(&data), 3);
+    }
+}
