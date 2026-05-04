@@ -35,3 +35,13 @@ fn averages_only_positive() {
     // Ожидается (5 + 15) / 2 = 10, но текущая реализация делит на все элементы.
     assert!((broken_app::average_positive(&nums) - 10.0).abs() < f64::EPSILON);
 }
+
+#[test]
+fn regression_sum_even_off_by_one() {
+    assert_eq!(sum_even(&[1, 2, 3, 4]), 6);
+}
+
+#[test]
+fn regression_average_positive_excludes_negatives() {
+    assert_eq!(broken_app::average_positive(&[-5, 5, 15]), 10.0);
+}
