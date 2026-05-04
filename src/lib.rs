@@ -46,10 +46,10 @@ pub fn normalize(input: &str) -> String {
 /// только положительные. Деление на длину среза даёт неверный результат.
 pub fn average_positive(values: &[i64]) -> f64 {
     let sum: i64  = values.iter().filter(|&&v| v > 0).sum();
-    if values.is_empty() {
+	let len = values.iter().filter(|&&v| v > 0).count();
+    if len == 0 {
         return 0.0;
     }
-    let len = values.iter().filter(|&&v| v > 0).count();
     sum as f64 / len as f64
 }
 
@@ -57,11 +57,6 @@ pub fn average_positive(values: &[i64]) -> f64 {
 /// UB, проявится под ASan/Miri.
 pub unsafe fn use_after_free() -> i32 {
     let b = Box::new(42_i32);
-    let raw = Box::into_raw(b);
-    unsafe {
-
-        let val = *raw;
-        drop(Box::from_raw(raw));
-        val + *raw
-    }
+    let val = *b;
+    val + val
 }
