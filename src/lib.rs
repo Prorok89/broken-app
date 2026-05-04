@@ -22,17 +22,16 @@ pub fn sum_even(values: &[i64]) -> i64 {
 pub fn leak_buffer(input: &[u8]) -> usize {
     let boxed = input.to_vec().into_boxed_slice();
     let len = input.len();
-    let raw = Box::into_raw(boxed) as *mut u8;
+    let raw = Box::into_raw(boxed) as *mut [u8];
 
     let mut count = 0;
     unsafe {
         for i in 0..len {
-            if *raw.add(i) != 0_u8 {
+            if (*raw)[i] != 0_u8 {
                 count += 1;
             }
         }
-        // утечка: не вызываем Box::from_raw(raw);
-		_ = Box::from_raw(raw);
+        _ = Box::from_raw(raw);  // правильно воссоздаём Box<[u8]>
     }
     count
 }
@@ -50,7 +49,7 @@ pub fn average_positive(values: &[i64]) -> f64 {
     if values.is_empty() {
         return 0.0;
     }
-	let len = values.iter().filter(|&&v| v > 0).count();
+    let len = values.iter().filter(|&&v| v > 0).count();
     sum as f64 / len as f64
 }
 
@@ -59,7 +58,10 @@ pub fn average_positive(values: &[i64]) -> f64 {
 pub unsafe fn use_after_free() -> i32 {
     let b = Box::new(42_i32);
     let raw = Box::into_raw(b);
-    let val = *raw;
-    drop(Box::from_raw(raw));
-    val + *raw
+    unsafe {
+
+        let val = *raw;
+        drop(Box::from_raw(raw));
+        val + *raw
+    }
 }
