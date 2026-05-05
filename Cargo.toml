@@ -12,5 +12,5 @@ criterion = "0.5"
 name = "baseline"
 harness = false
 
-[build]
-rustflags = ["-C", "opt-level=0"]
+[profile.release]
+debug = 1
