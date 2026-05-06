@@ -17,8 +17,9 @@ pub fn sum_even(values: &[i64]) -> i64 {
     acc
 }
 
-/// Подсчёт ненулевых байтов. Буфер намеренно не освобождается,
-/// что приведёт к утечке памяти (Valgrind это покажет).
+/// Подсчёт ненулевых байтов.
+/// [Профилирование]: Выполняет лишнюю аллокацию памяти (heap allocation)
+/// для создания boxed slice
 pub fn leak_buffer(input: &[u8]) -> usize {
     let boxed = input.to_vec().into_boxed_slice();
     let len = input.len();
