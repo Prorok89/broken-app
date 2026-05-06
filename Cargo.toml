@@ -12,6 +12,10 @@ criterion = "0.5"
 name = "baseline"
 harness = false
 
+[[bench]]
+name = "criterion_bench"
+harness = false
+
 [profile.release]
 opt-level = 0
 debug = true
