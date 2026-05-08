@@ -59,3 +59,54 @@
 | **normalize/long** | ~610 µs | ~690 µs | Без изменений |
 
 *Примечание: `leak_buffer` и `normalize` показали незначительные регрессии, находящиеся в пределах погрешности замеров, однако `leak_buffer` полностью убрал лишние выделения памяти, что зафиксировано Heaptrack и Valgrind.*
+
+## Команды запуска
+
+### Тесты
+
+```bash
+# Обычные тесты
+cargo test
+
+# Регрессионные тесты
+cargo test --test integration
+```
+
+### Проверка памяти и UB
+
+```bash
+# Miri (Undefined Behavior)
+cargo +nightly miri test
+
+# Valgrind (утечки памяти) — запуск в WSL
+valgrind --leak-check=full ./target/release/demo
+
+# ASan (ошибки памяти) — запуск в WSL
+RUSTFLAGS="-Zsanitizer=address" RUSTDOCFLAGS="-Zsanitizer=address" cargo +nightly test -Zbuild-std --target x86_64-unknown-linux-gnu
+
+# TSan (гонки потоков) — запуск в WSL
+RUSTFLAGS="-Zsanitizer=thread" RUSTDOCFLAGS="-Zsanitizer=thread" cargo +nightly test -Zbuild-std --target x86_64-unknown-linux-gnu
+```
+
+### Бенчмарки (Criterion)
+```bash
+# Запуск бенчмарков
+cargo bench --bench criterion_bench
+
+# Сохранение базовой линии ("до")
+cargo bench --bench criterion_bench -- --save-baseline before
+
+# Сравнение с базовой линией
+cargo bench --bench criterion_bench -- --baseline before
+```
+Артефакты находятся в директории ` artifacts/`
+
+### Профилирование (WSL)
+```bash
+# Perf + Flamegraph (CPU)
+cargo flamegraph --release --bin demo
+
+# Heaptrack (память)
+heaptrack ./target/release/demo
+heaptrack_print "heaptrack.demo.*.gz"
+```

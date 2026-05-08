@@ -1,4 +1,5 @@
-use broken_app::{algo, leak_buffer, normalize, sum_even};
+use broken_app::{algo, leak_buffer, normalize, sum_even, use_after_free};
+use broken_app::concurrency;
 
 #[test]
 fn sums_even_numbers() {
@@ -54,4 +55,17 @@ fn regression_leak_buffer_no_memory_leak() {
     for _ in 0..100 {
         assert_eq!(leak_buffer(&data), 3);
     }
+}
+
+#[test]
+fn regression_use_after_free_no_ub() {
+    assert_eq!(use_after_free(), 84);
+}
+
+#[test]
+fn regression_race_increment_no_data_race() {
+    let iterations = 1000;
+    let threads = 4;
+    let result = concurrency::race_increment(iterations, threads);
+    assert_eq!(result, (iterations * threads) as u64);
 }
